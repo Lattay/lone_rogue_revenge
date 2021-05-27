@@ -15,27 +15,32 @@ sprite_sheet = {
     "tank": scale_up(_sheet.subsurface(Rect(0, 0, 16, 16))),
     "hunter": scale_up(_sheet.subsurface(Rect(16, 0, 16, 16))),
     "destroyer": scale_up(_sheet.subsurface(Rect(32, 0, 16, 16))),
-    "mothership": scale_up(_sheet.subsurface(Rect(0, 32, 32, 32))),
 }
 
 animated = {
-    "float": list(
-        map(
-            scale_up,
-            (scale_up(_sheet.subsurface(Rect(i * 16, 96, 16, 16))) for i in range(3)),
-        )
-    ),
+    "satellite": [
+        scale_up(_sheet.subsurface(Rect(64 + i * 16, 48, 16, 16)))
+        for i in range(3)
+    ],
     "explosion": [
-        scale_up(_sheet.subsurface(Rect(i * 16, 64, 16, 16))) for i in range(8)
+        scale_up(_sheet.subsurface(Rect(i * 16, 64, 16, 16)))
+        for i in range(8)
     ],
     "star": [
-        scale_up(_sheet.subsurface(Rect(32 + i * 16, 32, 16, 16))) for i in range(6)
+        scale_up(_sheet.subsurface(Rect(32 + i * 16, 32, 16, 16)))
+        for i in range(6)
     ],
     "rock": [
-        scale_up(_sheet.subsurface(Rect(48 + 16 * i, 16, 16, 16))) for i in range(2)
+        scale_up(_sheet.subsurface(Rect(48 + 16 * i, 16, 16, 16)))
+        for i in range(2)
     ],
     "bullet": [
-        scale_up(_sheet.subsurface(Rect(48 + 16 * i, 96, 16, 16))) for i in range(2)
+        scale_up(_sheet.subsurface(Rect(32 + 16 * i, 48, 16, 16)))
+        for i in range(2)
+    ],
+    "mothership": [
+        scale_up(_sheet.subsurface(Rect(48 * i, 80, 48, 48)))
+        for i in range(2)
     ],
 }
 

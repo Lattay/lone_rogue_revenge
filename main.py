@@ -6,8 +6,11 @@ from glob import globs
 from utils import FlexObj
 from action import ActionStates, handler
 from collision_handler import CollisionHandler
+from hero import reset
 
 from scene_tools import load_level
+
+max_spawn_rate = 0.015
 
 button_map = {
     "fire": 0,
@@ -102,6 +105,11 @@ def on_quit(_, __):
     return True
 
 
+@handler.register(pygame.USEREVENT, "reload")
+def on_reload(_, __):
+    return True
+
+
 def main():
     pygame.init()
     pygame.joystick.init()
@@ -129,8 +137,13 @@ def main():
     globs.groups.solid = solid
     globs.groups.hero = hero
 
+    globs.spawn_proba = max_spawn_rate
+    globs.life = 3
+
     db = globs.debug
     load_level("assets/level1.json", visible, ally_bullet, enemy_bullet, enemy, solid, hero)
+
+    globs.starter_pos = hero.sprite.pos
 
     collision_handlers = [
         CollisionHandler(hero, enemy, solid, enemy_bullet),
@@ -149,16 +162,21 @@ def main():
         globs.actions = actions
         db.debug(f"FPS: {clock.get_fps()}")
 
+        if actions.reload:
+            reset()
+
         for h in collision_handlers:
             h.handle_collisions()
 
         # update
         visible.update()
+        globs.spawn_proba = max_spawn_rate / (1 + len(enemy.sprites()))
 
         # draw
         screen.fill(BLACK)
 
         visible.draw(screen)
+        globs.debug.debug(f"hero life: {globs.life}")
 
         if DEBUG:
             db.draw(screen)

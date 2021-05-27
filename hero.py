@@ -1,4 +1,5 @@
-from pygame.time import get_ticks
+from pygame.locals import USEREVENT
+from pygame.time import get_ticks, set_timer
 
 from constants import Z
 from glob import globs
@@ -14,27 +15,25 @@ class Hero(Ship):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.direction = (0, 1)
-        self.life = 3
         self.cooldown = -1
         self.bullet_group = globs.groups.ally_bullet
+        globs.dead = False
 
     def update(self):
         # ===== React to messages =====
-        lf = self.life
         for sender, msg in self.get_messages():
             if msg == "hit":
-                if lf == 1:
-                    Explosion(*self.pos, globs.groups.visible)
-                    self.kill()
-                    return
-                else:
-                    self.life = lf - 1  # prevent multiple shot in same frame
+                Explosion(*self.pos, globs.groups.visible)
+                globs.dead = True
+                self.kill()
+                if globs.life > 0:
+                    plan_event(USEREVENT, 1000)
+                return
 
         # ===== React to inputs =====
         act = globs.actions
         # Movement
-        d = (act.left - act.right, act.up - act.down)
+        d = (act.right - act.left, act.down - act.up)
         if d != (0, 0) and d != self.direction:
             self.direction = d
         self.move_toward(self.direction)
@@ -49,4 +48,13 @@ class Hero(Ship):
 
         globs.debug.debug(f"hero pos: ({int(self.pos[0])}, {int(self.pos[1])})")
 
-        globs.debug.debug(f"hero life: {self.life}")
+
+def plan_event(event_type, t):
+    set_timer(event_type, t, True)
+
+
+def reset():
+    globs.life -= 1
+
+    Hero(*globs.starter_pos, globs.groups.visible, globs.groups.hero)
+    globs.camera = globs.starter_pos

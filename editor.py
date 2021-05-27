@@ -1,7 +1,10 @@
+import sys
 import json
 
 import pygame
 from pygame import transform
+from pygame.rect import Rect
+from pygame.surface import Surface
 
 from constants import W, H, BLACK
 from glob import globs
@@ -10,7 +13,6 @@ from assets import get_animation, get_sprite, sprite_sheet, animated
 from entity import Entity
 from utils import wrap
 
-filename = "level_dump.json"
 
 key_map = {
     "turn": pygame.K_r,
@@ -93,7 +95,7 @@ def on_quit(_, __):
     return True
 
 
-def main():
+def main(filename):
     pygame.init()
     screen = pygame.display.set_mode((W, H), flags=pygame.RESIZABLE | pygame.SCALED)
     clock = pygame.time.Clock()
@@ -124,6 +126,8 @@ def main():
         visible.draw(screen)
 
         db.draw(screen)
+
+        world.draw_ui(screen)
 
         pygame.display.flip()
 
@@ -186,6 +190,17 @@ class World:
         globs.debug.debug(f"pos: ({int(x + dx)}, {int(y + dy)})")
         globs.debug.debug(f"dir: {dirs[self.dir]}")
         globs.debug.debug(f"current sprite: {self.sprite}")
+
+    def draw_ui(self, screen):
+        if get_type_asset(self.sprite) == "anim":
+            im = get_animation(self.sprite)[0]
+        else:
+            im = get_sprite(self.sprite)
+
+        r = im.get_rect()
+        w, h = r.size
+        r = Rect(W - w - 20, 20, w, h)
+        screen.blit(im, r)
 
 
 class Anchor(Entity):
@@ -265,4 +280,5 @@ def dump(anchors):
 
 
 if __name__ == "__main__":
-    main()
+    filepath = sys.argv[1] if len(sys.argv) > 1 else "level_dump.json"
+    main(filepath)

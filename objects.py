@@ -61,7 +61,7 @@ class Bullet(Destructible):
     def update(self):
         super().update()
         x, y = self.pos
-        self.pos = (x - self.dx, y - self.dy)
+        self.pos = (x + self.dx, y + self.dy)
         self.anim_counter += 1
         self.image = self.animation[(self.anim_counter // 12) % 2]
         if self.anim_counter > BULLET_DIST / self.speed:

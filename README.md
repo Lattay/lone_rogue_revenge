@@ -23,9 +23,9 @@ Le but est de faire un clone du Bosconian de Namco, sans chercher à tout faire 
 
 ## TODO
 
-- IA ennemi seul
-- Vaisseau mère
 - IA groupe d'ennemis
+- Condition de défaite
+- Condition de victoire
 - Niveaux
 - HUD
 - Menus

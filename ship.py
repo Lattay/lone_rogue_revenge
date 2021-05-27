@@ -23,8 +23,10 @@ class Ship(Entity):
         self.shift_45 = self.shift_0 * SQRT_2
 
         self.shift = self.shift_0
+        self.direction = (0, 1)
 
     def look_toward(self, direction):
+        self.direction = direction
         self.image = self.images[direction]
 
         dx, dy = direction
@@ -45,7 +47,7 @@ class Ship(Entity):
         if abs(dx) + abs(dy) == 2:
             dx /= SQRT_2
             dy /= SQRT_2
-        self.pos = (x - dx * self.speed, y - dy * self.speed)
+        self.pos = (x + dx * self.speed, y + dy * self.speed)
 
     def shoot(self, toward):
         x, y = self.pos
@@ -54,7 +56,7 @@ class Ship(Entity):
         dx *= 1.5 * self.radius / n
         dy *= 1.5 * self.radius / n
 
-        Bullet(toward, x - dx, y - dy, globs.groups.visible, self.bullet_group)
+        Bullet(toward, x + dx, y + dy, globs.groups.visible, self.bullet_group)
 
     def set_rot(self, rot):
         """ Change the initial rotation.
