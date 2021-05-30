@@ -4,7 +4,6 @@ import json
 import pygame
 from pygame import transform
 from pygame.rect import Rect
-from pygame.surface import Surface
 
 from constants import W, H, BLACK
 from glob import globs

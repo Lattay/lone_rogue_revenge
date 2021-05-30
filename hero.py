@@ -56,5 +56,12 @@ def plan_event(event_type, t):
 def reset():
     globs.life -= 1
 
-    Hero(*globs.starter_pos, globs.groups.visible, globs.groups.hero)
+    h = Hero(*globs.starter_pos, globs.groups.visible, globs.groups.hero)
+    h.look_toward(globs.starter_dir)
+
     globs.camera = globs.starter_pos
+
+
+def save_hero_state(globs, hero):
+    globs.starter_pos = hero.pos
+    globs.starter_dir = hero.direction

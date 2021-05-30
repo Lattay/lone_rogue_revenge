@@ -1,5 +1,6 @@
 from pygame.sprite import Sprite
 from pygame.rect import Rect
+from pygame.math import Vector2
 
 from constants import W, H
 from glob import globs
@@ -15,7 +16,7 @@ class Entity(Actor, Sprite):
         Sprite.__init__(self, *args, **kwargs)
         Actor.__init__(self)
         self._mailbox = []
-        self.pos = (x, y)
+        self.pos = Vector2(x, y)
         self.size = (0, 0)
 
     @property

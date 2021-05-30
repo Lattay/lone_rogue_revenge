@@ -5,7 +5,7 @@ from constants import Z, FIELD_SIZE_SPRITE
 from objects import Star
 
 from hero import Hero
-from enemies import Tank, Destroyer, Hunter, Mothership, Spawner
+from enemies import Cargo, Fighter, Interceptor, Mothership, Spawner
 from objects import Rock, Mine
 
 HALF_FIELD_SPRITE = FIELD_SIZE_SPRITE // 2
@@ -22,9 +22,9 @@ def load_level(name, visible, ally_bullet, enemy_bullet, enemy, solid, hero):
     simples = {
         "rock": (Rock, False, (visible, solid)),
         "mine": (Mine, False, (visible, solid)),
-        "tank": (Tank, True, (visible, enemy)),
-        "destroyer": (Destroyer, True, (visible, enemy)),
-        "hunter": (Hunter, True, (visible, enemy)),
+        "cargo": (Cargo, True, (visible, enemy)),
+        "fighter": (Fighter, True, (visible, enemy)),
+        "interceptor": (Interceptor, True, (visible, enemy)),
     }
 
     with open(name) as f:

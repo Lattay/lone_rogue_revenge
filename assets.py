@@ -12,9 +12,12 @@ _sheet = pygame.image.load("assets/space_ships.png")
 sprite_sheet = {
     "mine": scale_up(_sheet.subsurface(Rect(48, 0, 16, 16))),
     "hero": scale_up(_sheet.subsurface(Rect(0, 16, 16, 16))),
-    "tank": scale_up(_sheet.subsurface(Rect(0, 0, 16, 16))),
-    "hunter": scale_up(_sheet.subsurface(Rect(16, 0, 16, 16))),
-    "destroyer": scale_up(_sheet.subsurface(Rect(32, 0, 16, 16))),
+    "cargo": scale_up(_sheet.subsurface(Rect(0, 0, 16, 16))),
+    "cargo_leader": scale_up(_sheet.subsurface(Rect(64, 0, 16, 16))),
+    "interceptor": scale_up(_sheet.subsurface(Rect(16, 0, 16, 16))),
+    "interceptor_leader": scale_up(_sheet.subsurface(Rect(80, 0, 16, 16))),
+    "fighter": scale_up(_sheet.subsurface(Rect(32, 0, 16, 16))),
+    "fighter_leader": scale_up(_sheet.subsurface(Rect(96, 0, 16, 16))),
 }
 
 animated = {

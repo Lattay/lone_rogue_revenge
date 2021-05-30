@@ -1,6 +1,8 @@
 import math
 
 from pygame.transform import rotate
+from pygame.math import Vector2
+
 from constants import ROTATIONS, SQRT_2
 
 from entity import Entity
@@ -8,7 +10,7 @@ from assets import get_sprite
 from glob import globs
 from objects import Bullet
 
-directions = [(0, 1), (-1, 0), (0, -1), (1, 0)]
+directions = [(0, -1), (-1, 0), (0, 1), (1, 0)]
 
 
 class Ship(Entity):
@@ -47,7 +49,7 @@ class Ship(Entity):
         if abs(dx) + abs(dy) == 2:
             dx /= SQRT_2
             dy /= SQRT_2
-        self.pos = (x + dx * self.speed, y + dy * self.speed)
+        self.pos = Vector2(x + dx * self.speed, y + dy * self.speed)
 
     def shoot(self, toward):
         x, y = self.pos

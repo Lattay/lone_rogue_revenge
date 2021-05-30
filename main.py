@@ -6,7 +6,7 @@ from glob import globs
 from utils import FlexObj
 from action import ActionStates, handler
 from collision_handler import CollisionHandler
-from hero import reset
+from hero import reset, save_hero_state
 
 from scene_tools import load_level
 
@@ -143,7 +143,7 @@ def main():
     db = globs.debug
     load_level("assets/level1.json", visible, ally_bullet, enemy_bullet, enemy, solid, hero)
 
-    globs.starter_pos = hero.sprite.pos
+    save_hero_state(globs, hero.sprite)
 
     collision_handlers = [
         CollisionHandler(hero, enemy, solid, enemy_bullet),

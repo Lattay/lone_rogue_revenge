@@ -1,4 +1,7 @@
 import random
+from bisect import bisect_right as bisect
+from enum import Enum
+from enum import auto as enum_auto
 from math import hypot
 
 from pygame import math, time
@@ -14,7 +17,7 @@ from entity import Entity
 from assets import get_animation
 from ship import Ship
 from objects import Explosion, Bullet
-from utils import dist2, FlexObj
+from utils import dist2, FlexObj, wrap
 
 dirs = [
     (d, math.Vector2(*d).normalize())
@@ -27,7 +30,14 @@ abandon_dist2 = (14 * Z * 16)**2
 shoot_dist2 = (Z * 5 * 16)**2
 
 satellite_shooting_rate = 2000
-destroyer_shooting_rate = 1500
+fighter_shooting_rate = 1500
+
+
+class EnemyState(Enum):
+    WANDERING = enum_auto()
+    FOLLOWING = enum_auto()
+    FLEEING = enum_auto()
+    AGGRO = enum_auto()
 
 
 class Enemy(Ship):
@@ -41,6 +51,11 @@ class Enemy(Ship):
         self.next_change = 0
 
         self.direction_cooldown = 0
+
+        self.state = EnemyState.WANDERING
+
+    def transit(self, state):
+        self.state = state
 
     def pick_direction(self):
         return (0, 1)
@@ -65,50 +80,116 @@ class Enemy(Ship):
             return d
         return None
 
-    def target_hero(self):
+    def target_hero(self, flee=False):
         hero = globs.groups.hero.sprite
         if hero is None:
             return None
         hx, hy = hero.pos
         mx, my = self.pos
-        target = math.Vector2(hx - mx, hy - my)
+        target = math.Vector2(wrap(hx - mx), wrap(hy - my))
+        if flee:
+            target = -target
 
         return max(dirs, key=lambda d: d[1].dot(target))[0]
 
     def update(self):
+        if self.state == EnemyState.FOLLOWING:
+            for sender, msg in self.get_messages():
+                if msg == "hit":
+                    Explosion(*self.pos, globs.groups.visible)
+                    self.kill()
+                    return
+                elif msg == "disband":
+                    self.transit(EnemyState.FLEEING)
+                elif isinstance(msg, tuple):
+                    label, data = msg
+                    if label == "changedir":
+                        self.direction = data
+        else:
+            tk = time.get_ticks()
+            if tk > self.direction_cooldown:
+                d = self.pick_direction()
+                if not d:
+                    d = self.wander()
+                self.direction = d
+                self.direction_cooldown = tk + self.direction_cooldown_length
+
+            for sender, msg in self.get_messages():
+                if msg == "hit":
+                    Explosion(*self.pos, globs.groups.visible)
+                    self.kill()
+                    return
+
+        self.move_toward(self.direction)
+
+        if self.want_to_shoot():
+            self.shoot(self.direction)
+
+
+def leader(Cls):
+    def update(self):
+        for sender, msg in self.get_messages():
+            if msg == "hit":
+                for member in self.squad:
+                    self.send(member, "disband")
+                Explosion(*self.pos, globs.groups.visible)
+                self.kill()
+                return
+
         tk = time.get_ticks()
+
         if tk > self.direction_cooldown:
             d = self.pick_direction()
             if not d:
                 d = self.wander()
             self.direction = d
             self.direction_cooldown = tk + self.direction_cooldown_length
+            for member in self.squad:
+                self.send(member, ("changedir", d))
+
         self.move_toward(self.direction)
-        for sender, msg in self.get_messages():
-            if msg == "hit":
-                Explosion(*self.pos, globs.groups.visible)
-                self.kill()
-                return
 
-        if self.want_to_shoot():
-            self.shoot(self.direction)
+    def spawn_squad(self):
+        for i in range(4):
+            pos = self.pos + Vector2(1, 1).rotate(i * 90) * Z * 16
+            m = self.Member(*pos, self.squad, *self.groups())
+            m.transit(EnemyState.FOLLOWING)
+
+    Cls.update = update
+
+    def Wrapper(*args, **kwargs):
+        instance = Cls(*args, **kwargs)
+        instance.squad = Group()
+        spawn_squad(instance)
+        instance.transit(EnemyState.AGGRO)
+        return instance
+
+    return Wrapper
 
 
-class Tank(Enemy):
-    sprite_name = "tank"
+class Cargo(Enemy):
+    sprite_name = "cargo"
     speed = 3.1
 
     def pick_direction(self):
-        return self.watch_solid() or self.target_hero()
+        if self.state == EnemyState.FLEEING:
+            return self.watch_solid() or self.target_hero(flee=True)
+        else:
+            return self.watch_solid() or self.target_hero()
 
 
-class Hunter(Enemy):
-    sprite_name = "hunter"
+@leader
+class CargoLeader(Cargo):
+    sprite_name = "cargo_leader"
+    Member = Cargo
+
+
+class Interceptor(Enemy):
+    sprite_name = "interceptor"
     speed = 5.0
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.aggro = False
         self.wait_more = 0
 
     def pick_direction(self):
@@ -117,24 +198,34 @@ class Hunter(Enemy):
         if hero is not None:
             d = dist2(hero.pos, self.pos)
 
-        if self.aggro:
-            self.aggro = (hero is not None) and (d < abandon_dist2)
-        else:
-            self.aggro = (hero is not None) and (d < aggro_dist2)
+        if self.state == EnemyState.AGGRO:
+            if hero is None or d > abandon_dist2:
+                self.transit(EnemyState.WANDERING)
+        elif self.state == EnemyState.WANDERING:
+            if hero is not None and d < aggro_dist2:
+                self.transit(EnemyState.AGGRO)
 
-        if not self.aggro:
+        if self.state == EnemyState.WANDERING:
             if self.wait_more == 3:  # wait 3 times more if not aggro
                 self.wait_more = 0
                 return self.watch_solid()
             else:
                 self.wait_more += 1
                 return None
-        else:
+        elif self.state == EnemyState.FLEEING:
+            return self.watch_solid() or self.target_hero(flee=True)
+        elif self.state == EnemyState.AGGRO:
             return self.watch_solid() or self.target_hero()
 
 
-class Destroyer(Hunter):
-    sprite_name = "destroyer"
+@leader
+class InterceptorLeader(Interceptor):
+    sprite_name = "interceptor_leader"
+    Member = Interceptor
+
+
+class Fighter(Interceptor):
+    sprite_name = "fighter"
     speed = 3.5
 
     def __init__(self, *args, **kwargs):
@@ -142,9 +233,11 @@ class Destroyer(Hunter):
         self.shoot_cooldown = 0
 
     def want_to_shoot(self):
+        if self.state != EnemyState.AGGRO:
+            return False
         hero = globs.groups.hero.sprite
-        if hero and self.aggro and self.shoot_cooldown < get_ticks():
-            self.shoot_cooldown = get_ticks() + destroyer_shooting_rate
+        if hero and self.shoot_cooldown < get_ticks():
+            self.shoot_cooldown = get_ticks() + fighter_shooting_rate
             return True
         return False
 
@@ -226,9 +319,19 @@ class Spawner(Sprite):
         r = random.random()
         if r < globs.spawn_proba:
             r /= globs.spawn_proba
-            if r < 0.2:
-                Hunter(*self.pos, globs.groups.visible, globs.groups.enemy)
-            elif r < 0.4:
-                Destroyer(*self.pos, globs.groups.visible, globs.groups.enemy)
-            else:
-                Tank(*self.pos, globs.groups.visible, globs.groups.enemy)
+            RandomClass(r)(*self.pos, globs.groups.visible, globs.groups.enemy)
+
+
+def RandomClass(r):
+    odds = [
+        (7, Cargo),
+        (3, Interceptor),
+        (2, Fighter),
+        (1, InterceptorLeader),
+        (1, CargoLeader),
+    ]
+
+    tot = sum(n for n, _ in odds)
+    table = [sum(n for n, _ in odds[:i]) / tot for i, _ in enumerate(odds)]
+    i = bisect(table, r) - 1
+    return odds[i][1]
