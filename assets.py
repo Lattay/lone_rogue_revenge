@@ -18,6 +18,7 @@ sprite_sheet = {
     "interceptor_leader": scale_up(_sheet.subsurface(Rect(80, 0, 16, 16))),
     "fighter": scale_up(_sheet.subsurface(Rect(32, 0, 16, 16))),
     "fighter_leader": scale_up(_sheet.subsurface(Rect(96, 0, 16, 16))),
+    "shield": scale_up(_sheet.subsurface(Rect(0, 80, 48, 16))),
 }
 
 animated = {
@@ -42,7 +43,7 @@ animated = {
         for i in range(2)
     ],
     "mothership": [
-        scale_up(_sheet.subsurface(Rect(48 * i, 80, 48, 48)))
+        scale_up(_sheet.subsurface(Rect(16 * i, 96, 16, 16)))
         for i in range(2)
     ],
 }

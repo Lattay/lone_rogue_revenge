@@ -43,12 +43,12 @@ class Mine(Destructible):
 
 
 class Bullet(Destructible):
-    radius = Z * 2
-    speed = 7.0
+    radius = Z * 1
+    speed = 6.0
     explode = False
 
-    def __init__(self, toward, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+    def __init__(self, toward, x, y, *args, **kwargs):
+        super().__init__(x, y, self.bullet_group(), *args, **kwargs)
         self.animation = get_animation("bullet")
         self.image = self.animation[0]
         self.anim_counter = 0
@@ -58,6 +58,9 @@ class Bullet(Destructible):
         self.dx = dx * self.speed / n
         self.dy = dy * self.speed / n
 
+    def bullet_group(self):
+        return globs.groups.enemy_bullet
+
     def update(self):
         super().update()
         x, y = self.pos
@@ -66,6 +69,13 @@ class Bullet(Destructible):
         self.image = self.animation[(self.anim_counter // 12) % 2]
         if self.anim_counter > BULLET_DIST / self.speed:
             self.kill()
+
+
+class HeroBullet(Bullet):
+    speed = 7.0
+
+    def bullet_group(self):
+        return globs.groups.ally_bullet
 
 
 class Star(Entity):

@@ -1,3 +1,6 @@
+from pygame.event import custom_type
+
+
 W, H = 1280, 720  # Canvas size
 Z = 4  # Zoom
 
@@ -29,3 +32,6 @@ ROTATIONS = [
 SQRT_2 = 2 ** 0.5
 
 DEBUG = True
+
+RESET_PLAYER = custom_type()
+LOOSE = custom_type()

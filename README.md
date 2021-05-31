@@ -23,10 +23,10 @@ Le but est de faire un clone du Bosconian de Namco, sans chercher à tout faire 
 
 ## TODO
 
-- Condition de défaite
-- Condition de victoire
+- Score
 - Niveaux
 - HUD
 - Menus
 - Minimap
 - Bruitage
+- Powerups

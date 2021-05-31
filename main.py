@@ -1,6 +1,7 @@
 import pygame
+from pygame.math import Vector2
 
-from constants import W, H, DEADZONE, BLACK, DEBUG
+from constants import W, H, DEADZONE, BLACK, DEBUG, RESET_PLAYER, LOOSE
 from glob import globs
 
 from utils import FlexObj
@@ -105,8 +106,13 @@ def on_quit(_, __):
     return True
 
 
-@handler.register(pygame.USEREVENT, "reload")
+@handler.register(RESET_PLAYER, "reload")
 def on_reload(_, __):
+    return True
+
+
+@handler.register(LOOSE, "loose")
+def on_loose(_, __):
     return True
 
 
@@ -121,13 +127,14 @@ def main():
 
     clock = pygame.time.Clock()
 
-    globs.camera = (0, 0)
+    globs.camera = Vector2(0, 0)
 
     visible = pygame.sprite.Group()
     ally_bullet = pygame.sprite.Group()
     enemy_bullet = pygame.sprite.Group()
     enemy = pygame.sprite.Group()
     solid = pygame.sprite.Group()
+    mothership = pygame.sprite.Group()
     hero = pygame.sprite.GroupSingle()
     globs.groups = FlexObj()
     globs.groups.visible = visible
@@ -136,12 +143,16 @@ def main():
     globs.groups.enemy = enemy
     globs.groups.solid = solid
     globs.groups.hero = hero
+    globs.groups.mothership = mothership
 
     globs.spawn_proba = max_spawn_rate
     globs.life = 3
 
+    globs.score = 0
+
     db = globs.debug
-    load_level("assets/level1.json", visible, ally_bullet, enemy_bullet, enemy, solid, hero)
+    load_level("assets/level1.json", visible, ally_bullet,
+               enemy_bullet, enemy, solid, hero, mothership)
 
     save_hero_state(globs, hero.sprite)
 
@@ -164,6 +175,11 @@ def main():
 
         if actions.reload:
             reset()
+        elif actions.loose:
+            break
+        else:
+            if not mothership.sprites():
+                break
 
         for h in collision_handlers:
             h.handle_collisions()
@@ -177,6 +193,7 @@ def main():
 
         visible.draw(screen)
         globs.debug.debug(f"hero life: {globs.life}")
+        globs.debug.debug(f"score: {globs.score}")
 
         if DEBUG:
             db.draw(screen)

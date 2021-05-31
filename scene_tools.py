@@ -18,7 +18,7 @@ def gen_stars(*groups):
                 Star(i * 16 * Z, j * 16 * Z, *groups)
 
 
-def load_level(name, visible, ally_bullet, enemy_bullet, enemy, solid, hero):
+def load_level(name, visible, ally_bullet, enemy_bullet, enemy, solid, hero, mothership):
     simples = {
         "rock": (Rock, False, (visible, solid)),
         "mine": (Mine, False, (visible, solid)),
@@ -49,4 +49,4 @@ def load_level(name, visible, ally_bullet, enemy_bullet, enemy, solid, hero):
                     obj.set_rot(rot)
         elif name == "mothership":
             for pos, _ in instances:
-                Mothership(*pos, visible, enemy)
+                Mothership(*pos, visible, mothership, enemy)

@@ -1,22 +1,24 @@
-from pygame.locals import USEREVENT
 from pygame.time import get_ticks, set_timer
 
-from constants import Z
+from constants import Z, RESET_PLAYER, LOOSE, DEBUG
 from glob import globs
 
 from ship import Ship
-from objects import Explosion
+from objects import Explosion, HeroBullet
+
+
+shoot_cooldown = 250
 
 
 class Hero(Ship):
     sprite_name = "hero"
-    speed = 3.0
+    speed = 3.2
     radius = Z * 5
+    Bullet = HeroBullet
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.cooldown = -1
-        self.bullet_group = globs.groups.ally_bullet
         globs.dead = False
 
     def update(self):
@@ -27,7 +29,9 @@ class Hero(Ship):
                 globs.dead = True
                 self.kill()
                 if globs.life > 0:
-                    plan_event(USEREVENT, 1000)
+                    plan_event(RESET_PLAYER, 1000)
+                else:
+                    plan_event(LOOSE, 1000)
                 return
 
         # ===== React to inputs =====
@@ -36,15 +40,17 @@ class Hero(Ship):
         d = (act.right - act.left, act.down - act.up)
         if d != (0, 0) and d != self.direction:
             self.direction = d
+
         self.move_toward(self.direction)
-        globs.camera = self.pos
+
+        globs.camera.update(self.pos)
 
         # Fire
         if act.fire and self.cooldown < get_ticks():
             dx, dy = self.direction
             self.shoot((dx, dy))
             self.shoot((-dx, -dy))
-            self.cooldown = get_ticks() + 300
+            self.cooldown = get_ticks() + shoot_cooldown
 
         globs.debug.debug(f"hero pos: ({int(self.pos[0])}, {int(self.pos[1])})")
 

@@ -1,9 +1,17 @@
 from pygame.sprite import groupcollide
-from utils import dist2, Actor
+from utils import dist2
+from enemies import Shield
 
 
-def collide_circle(a, b):
-    return a != b and (a.radius + b.radius) ** 2 > dist2(a.pos, b.pos)
+def collide(a, b):
+    if a == b:
+        return False
+    if isinstance(b, Shield):
+        return b.collides(a)
+    elif isinstance(a, Shield):
+        return a.collides(b)
+    else:
+        return dist2(a.pos, b.pos) < (a.radius + b.radius)**2
 
 
 class CollisionHandler:
@@ -20,9 +28,10 @@ class CollisionHandler:
                     g,
                     False,
                     False,
-                    collided=collide_circle,
+                    collided=collide,
                 )
             )
 
         for t in c:
-            Actor.send_to(t, "hit")
+            first, *_ = c[t]
+            first.send(t, "hit")

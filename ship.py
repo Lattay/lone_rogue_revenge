@@ -14,6 +14,8 @@ directions = [(0, -1), (-1, 0), (0, 1), (1, 0)]
 
 
 class Ship(Entity):
+    Bullet = Bullet
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         im = get_sprite(self.sprite_name)
@@ -58,7 +60,7 @@ class Ship(Entity):
         dx *= 1.5 * self.radius / n
         dy *= 1.5 * self.radius / n
 
-        Bullet(toward, x + dx, y + dy, globs.groups.visible, self.bullet_group)
+        self.Bullet(toward, x + dx, y + dy, globs.groups.visible)
 
     def set_rot(self, rot):
         """ Change the initial rotation.

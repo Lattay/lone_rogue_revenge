@@ -1,6 +1,7 @@
 import math
 
 import pygame
+from pygame.surface import Surface
 
 from constants import WHITE, FIELD_SIZE
 from glob import register_global_singleton
@@ -92,10 +93,20 @@ class debug:
         super().__init__()
         self.font = None
         self._debug_stack = []
+        self._primitives = []
         self._offset = 0
 
     def draw(self, screen):
         self.init_font()
+
+        for i, (type, data) in enumerate(self._primitives):
+            if type == "rect":
+                img = Surface(data.size)
+                img.fill((255, 30, 100))
+                screen.blit(img, data.topleft)
+
+        self._primitives.clear()
+
         for i, msg in enumerate(self._debug_stack):
             img = self.font.render(msg, True, WHITE)
             screen.blit(img, (20, i * 20))
@@ -108,3 +119,6 @@ class debug:
 
     def debug(self, msg):
         self._debug_stack.append(msg)
+
+    def debug_rect(self, rect):
+        self._primitives.append(("rect", rect))
