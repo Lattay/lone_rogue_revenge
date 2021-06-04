@@ -9,15 +9,12 @@ def register_singleton(cls):
     return Singleton()
 
 
-def register_global_singleton(cls):
-    instance = register_singleton(cls)
-    setattr(globs, cls.__name__, instance)
-    return instance
-
-
 @register_singleton
 class globs:
     def __init__(self):
+        self._forum = {}
+
+    def clear(self):
         self._forum = {}
 
     def register(self, name, obj):

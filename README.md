@@ -17,11 +17,11 @@ The game is written with Python and Pygame.
 - [X] enemy ships
 - [X] decent AI for enemies
 - [X] motherships
-- [ ] scoring
+- [X] scoring
+- [ ] scene transitions (menu to level, level to level, level to game over)
 - [ ] some levels
 - [ ] in game UI
 - [ ] game phases (calm, spy approaching, red alert)
-- [ ] scene transitions (menu to level, level to level, level to game over)
 - [ ] menus
 - [ ] sound FX
 - [ ] publish first version on itch.io

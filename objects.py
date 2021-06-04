@@ -15,6 +15,8 @@ class Destructible(Entity):
     def update(self):
         for sender, msg in self.get_messages():
             if msg == "hit":
+                if isinstance(sender, HeroBullet):
+                    self.score()
                 if self.explode:
                     Explosion(*self.pos, globs.groups.visible)
                 self.kill()
@@ -23,6 +25,7 @@ class Destructible(Entity):
 
 class Rock(Destructible):
     radius = Z * 6
+    value = 15
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -35,6 +38,7 @@ class Rock(Destructible):
 
 class Mine(Destructible):
     radius = Z * 8
+    value = 30
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

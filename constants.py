@@ -35,3 +35,14 @@ DEBUG = True
 
 RESET_PLAYER = custom_type()
 LOOSE = custom_type()
+
+
+LOOSE_STATE = 1
+START_STATE = 2
+NEXT_LEVEL_STATE = 3
+WIN_STATE = 4
+
+LEVELS = (
+    "assets/level2.json",
+    "assets/level1.json",
+)

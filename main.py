@@ -1,10 +1,14 @@
 import pygame
 from pygame.math import Vector2
 
-from constants import W, H, DEADZONE, BLACK, DEBUG, RESET_PLAYER, LOOSE
+from constants import (
+    W, H, DEADZONE, BLACK, DEBUG, RESET_PLAYER, LOOSE,
+    LOOSE_STATE, NEXT_LEVEL_STATE, START_STATE, WIN_STATE,
+    LEVELS
+)
 from glob import globs
 
-from utils import FlexObj
+from utils import FlexObj, Debug
 from action import ActionStates, handler
 from collision_handler import CollisionHandler
 from hero import reset, save_hero_state
@@ -116,14 +120,15 @@ def on_loose(_, __):
     return True
 
 
-def main():
-    pygame.init()
-    pygame.joystick.init()
+def run_level(game_state, screen, level_name):
+    globs.clear()
+
+    globs.score = game_state['score']
+    globs.life = game_state['life']
+
     globs.joysticks = [
         pygame.joystick.Joystick(i) for i in range(pygame.joystick.get_count())
     ]
-
-    screen = pygame.display.set_mode((W, H), flags=pygame.RESIZABLE | pygame.SCALED)
 
     clock = pygame.time.Clock()
 
@@ -146,12 +151,9 @@ def main():
     globs.groups.mothership = mothership
 
     globs.spawn_proba = max_spawn_rate
-    globs.life = 3
 
-    globs.score = 0
-
-    db = globs.debug
-    load_level("assets/level1.json", visible, ally_bullet,
+    globs.debug = db = Debug()
+    load_level(level_name, visible, ally_bullet,
                enemy_bullet, enemy, solid, hero, mothership)
 
     save_hero_state(globs, hero.sprite)
@@ -164,21 +166,27 @@ def main():
         CollisionHandler(enemy, hero, solid, ally_bullet),
     ]
 
-    running = True
-    while running:
+    next_state = None
+
+    while True:
         # handle events
         actions = ActionStates()
         handler.handle_events(actions)
-        running = not actions.quit
         globs.actions = actions
         db.debug(f"FPS: {clock.get_fps()}")
 
+        if actions.quit:
+            break
         if actions.reload:
             reset()
         elif actions.loose:
+            next_state = LOOSE_STATE
+            print("You lost !")
             break
         else:
             if not mothership.sprites():
+                next_state = NEXT_LEVEL_STATE
+                print("Next level !")
                 break
 
         for h in collision_handlers:
@@ -201,6 +209,36 @@ def main():
         pygame.display.flip()
 
         clock.tick(60)
+
+    game_state['score'] = globs.score
+    game_state['life'] = globs.score
+    return next_state
+
+
+def main():
+    pygame.init()
+    pygame.joystick.init()
+
+    screen = pygame.display.set_mode((W, H), flags=pygame.RESIZABLE | pygame.SCALED)
+
+    game_state = {
+        'score': 0,
+        'life': 2,
+    }
+
+    level = 0
+
+    state = START_STATE
+    while state and state != LOOSE_STATE:
+        if state == START_STATE:
+            level_name = LEVELS[level]
+            state = run_level(game_state, screen, level_name)
+        elif state == NEXT_LEVEL_STATE:
+            level += 1
+            if level > len(LEVELS):
+                state = WIN_STATE
+        elif state == WIN_STATE:
+            state = LOOSE_STATE
 
     pygame.quit()
 
