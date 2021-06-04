@@ -4,6 +4,7 @@ import json
 import pygame
 from pygame import transform
 from pygame.rect import Rect
+from pygame.math import Vector2
 
 from constants import W, H, BLACK
 from glob import globs
@@ -233,6 +234,7 @@ class Anchor(Entity):
         return act and self.rect.collidepoint(pygame.mouse.get_pos())
 
     def update(self):
+        super().update()
         if self.grabbed:
             if globs.actions.left_r:
                 self.grabbed = False
@@ -241,7 +243,7 @@ class Anchor(Entity):
                 px, py = self.prev_pos
                 nx, ny = pygame.mouse.get_pos()
                 self.prev_pos = (nx, ny)
-                self.pos = (x + nx - px, y + ny - py)
+                self.pos = Vector2(x + nx - px, y + ny - py)
         elif self.clicked(left=True):
             self.grabbed = True
             self.prev_pos = pygame.mouse.get_pos()

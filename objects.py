@@ -2,6 +2,7 @@ import math
 import random
 
 from pygame import transform
+from pygame.math import Vector2
 
 from constants import Z, BULLET_DIST
 from glob import globs
@@ -13,6 +14,7 @@ class Destructible(Entity):
     explode = True
 
     def update(self):
+        super().update()
         for sender, msg in self.get_messages():
             if msg == "hit":
                 if isinstance(sender, HeroBullet):
@@ -68,7 +70,7 @@ class Bullet(Destructible):
     def update(self):
         super().update()
         x, y = self.pos
-        self.pos = (x + self.dx, y + self.dy)
+        self.pos = Vector2(x + self.dx, y + self.dy)
         self.anim_counter += 1
         self.image = self.animation[(self.anim_counter // 12) % 2]
         if self.anim_counter > BULLET_DIST / self.speed:
@@ -102,6 +104,7 @@ class Explosion(Entity):
         self.anim_counter = 0
 
     def update(self):
+        super().update()
         self.anim_counter += 1
         a = self.anim_counter // 4
         if a == len(self.animation):

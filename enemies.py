@@ -140,6 +140,8 @@ class Enemy(Ship):
         if self.want_to_shoot():
             self.shoot(self.direction)
 
+        self.update_rect()
+
 
 def leader(Cls):
     def update(self):
@@ -168,6 +170,7 @@ def leader(Cls):
                 self.send(member, ("changedir", d))
 
         self.move_toward(self.direction)
+        self.update_rect()
 
     def spawn_squad(self):
         for i in range(4):
@@ -319,6 +322,8 @@ class Mothership(Entity):
             self.destroy()
             return
 
+        super().update()
+
 
 class Shield(Entity):
     def __init__(self, dir, *args, **kwargs):
@@ -382,6 +387,8 @@ class Satellites(Entity):
                 self.shared.shoot_cooldown = get_ticks() + satellite_shooting_rate
                 x, y = Vector2(hero.pos) - Vector2(self.pos)
                 self.shoot((wrap(x), wrap(y)))
+
+        super().update()
 
     def destroy(self):
         Explosion(*self.pos, globs.groups.visible)

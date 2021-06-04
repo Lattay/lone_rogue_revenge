@@ -53,6 +53,7 @@ class Hero(Ship):
             self.cooldown = get_ticks() + shoot_cooldown
 
         globs.debug.debug(f"hero pos: ({int(self.pos[0])}, {int(self.pos[1])})")
+        super().update()
 
 
 def plan_event(event_type, t):
