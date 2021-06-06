@@ -18,7 +18,10 @@ The game is written with Python and Pygame.
 - [X] decent AI for enemies
 - [X] motherships
 - [X] scoring
-- [ ] scene transitions (menu to level, level to level, level to game over)
+- [.] scene transitions
+    - [ ] menu to level
+    - [X] level to level
+    - [ ] level to game over
 - [ ] some levels
 - [ ] in game UI
 - [ ] game phases (calm, spy approaching, red alert)
