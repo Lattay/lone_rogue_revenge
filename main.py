@@ -211,7 +211,7 @@ def run_level(game_state, screen, level_name):
         clock.tick(60)
 
     game_state['score'] = globs.score
-    game_state['life'] = globs.score
+    game_state['life'] = globs.life
     return next_state
 
 
@@ -235,10 +235,13 @@ def main():
             state = run_level(game_state, screen, level_name)
         elif state == NEXT_LEVEL_STATE:
             level += 1
-            if level > len(LEVELS):
+            if level >= len(LEVELS):
                 state = WIN_STATE
+            else:
+                state = START_STATE
         elif state == WIN_STATE:
-            state = LOOSE_STATE
+            break
+    print(state)
 
     pygame.quit()
 

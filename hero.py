@@ -1,4 +1,5 @@
 from pygame.time import get_ticks, set_timer
+from pygame.math import Vector2
 
 from constants import Z, RESET_PLAYER, LOOSE, DEBUG
 from glob import globs
@@ -69,5 +70,5 @@ def reset():
 
 
 def save_hero_state(globs, hero):
-    globs.starter_pos = hero.pos
-    globs.starter_dir = hero.direction
+    globs.starter_pos = Vector2(hero.pos)
+    globs.starter_dir = tuple(hero.direction)

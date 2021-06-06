@@ -411,7 +411,7 @@ class Spawner(Sprite):
 
 
 _odds = [
-    (10, Cargo),
+    (8, Cargo),
     (6, Interceptor),
     (4, Fighter),
     (1, InterceptorLeader),
