@@ -26,14 +26,15 @@ class Hero(Ship):
         # ===== React to messages =====
         for sender, msg in self.get_messages():
             if msg == "hit":
-                Explosion(*self.pos, globs.groups.visible)
-                globs.dead = True
-                self.kill()
-                if globs.life > 0:
-                    plan_event(RESET_PLAYER, 1000)
-                else:
-                    plan_event(LOOSE, 1000)
-                return
+                if not isinstance(sender, HeroBullet):
+                    Explosion(*self.pos, globs.groups.visible)
+                    globs.dead = True
+                    self.kill()
+                    if globs.life > 0:
+                        plan_event(RESET_PLAYER, 1000)
+                    else:
+                        plan_event(LOOSE, 1000)
+                    return
 
         # ===== React to inputs =====
         act = globs.actions

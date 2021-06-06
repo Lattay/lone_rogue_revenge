@@ -18,7 +18,7 @@ from glob import globs
 from entity import Entity
 from assets import get_animation, get_sprite
 from ship import Ship
-from objects import Explosion, Bullet
+from objects import Explosion, Bullet, HeroBullet
 from utils import dist2, FlexObj, wrap
 
 dirs = [
@@ -104,10 +104,13 @@ class Enemy(Ship):
         if self.state == EnemyState.FOLLOWING:
             for sender, msg in self.get_messages():
                 if msg == "hit":
-                    if isinstance(sender, Bullet):
+                    if isinstance(sender, HeroBullet):
                         self.score()
-                    self.destroy()
-                    return
+                        self.destroy()
+                        return
+                    elif not isinstance(sender, Bullet):
+                        self.destroy()
+                        return
                 elif msg == "disband":
                     self.transit(EnemyState.FLEEING)
                 elif isinstance(msg, tuple):
@@ -130,10 +133,13 @@ class Enemy(Ship):
 
             for sender, msg in self.get_messages():
                 if msg == "hit":
-                    if isinstance(sender, Bullet):
+                    if isinstance(sender, HeroBullet):
                         self.score()
-                    self.destroy()
-                    return
+                        self.destroy()
+                        return
+                    elif not isinstance(sender, Bullet):
+                        self.destroy()
+                        return
 
         self.move_toward(self.direction)
 
@@ -149,12 +155,15 @@ def leader(Cls):
                 if squad:
                     for member in self.squad:
                         self.send(member, "disband")
-                if isinstance(sender, Bullet):
+                if isinstance(sender, HeroBullet):
                     if not squad:
                         self.value = 3 * self.value
                     self.score()
-                self.destroy()
-                return
+                    self.destroy()
+                    return
+                elif not isinstance(sender, Bullet):
+                    self.destroy()
+                    return
 
         tk = get_ticks()
 
@@ -304,9 +313,13 @@ class Mothership(Entity):
     def update(self):
         for sender, msg in self.get_messages():
             if msg == "hit":
-                if isinstance(sender, Bullet):
+                if isinstance(sender, HeroBullet):
                     self.score()
-                self.destroy()
+                    self.destroy()
+                    return
+                elif not isinstance(sender, Bullet):
+                    self.destroy()
+                    return
 
         self.tick += 1
         if self.tick >= 40:
@@ -371,10 +384,13 @@ class Satellites(Entity):
     def update(self):
         for sender, msg in self.get_messages():
             if msg == "hit":
-                if isinstance(sender, Bullet):
+                if isinstance(sender, HeroBullet):
                     self.score()
-                self.destroy()
-                return
+                    self.destroy()
+                    return
+                elif not isinstance(sender, Bullet):
+                    self.destroy()
+                    return
 
         hero = globs.groups.hero.sprite
         if hero and dist2(self.pos, hero.pos) < shoot_dist2:
