@@ -8,6 +8,7 @@ from constants import (
 )
 from glob import globs
 
+from assets import load_assets
 from utils import FlexObj, Debug
 from action import ActionStates, handler
 from collision_handler import CollisionHandler
@@ -160,10 +161,9 @@ def run_level(game_state, screen, level_name):
 
     collision_handlers = [
         CollisionHandler(hero, enemy, solid, enemy_bullet),
-        CollisionHandler(enemy_bullet, hero, solid, enemy),
+        CollisionHandler(enemy_bullet, solid, enemy),
         CollisionHandler(ally_bullet, hero, solid, enemy),
-        CollisionHandler(solid, hero, enemy, solid, enemy_bullet, ally_bullet),
-        CollisionHandler(enemy, hero, solid, ally_bullet),
+        CollisionHandler(enemy, solid),
     ]
 
     next_state = None
@@ -220,6 +220,7 @@ def main():
     pygame.joystick.init()
 
     screen = pygame.display.set_mode((W, H), flags=pygame.RESIZABLE | pygame.SCALED)
+    load_assets()
 
     game_state = {
         'score': 0,

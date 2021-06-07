@@ -36,6 +36,10 @@ class CollisionHandler:
                 )
             )
 
-        for t in c:
-            first, *_ = c[t]
+        all_collided = set()
+        for t, collection in c.items():
+            first, *_ = collection
             first.send(t, "hit")
+            for o in set(collection).difference(all_collided):
+                t.send(o, "hit")
+            all_collided.update(collection)
