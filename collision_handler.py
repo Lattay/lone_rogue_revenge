@@ -6,16 +6,12 @@ from enemies import Shield
 def collide(a, b):
     if a == b:
         return False
-    c = dist2(a.pos, b.pos) < (a.radius + b.radius)**2
-    if c:
-        if isinstance(b, Shield):
-            return b.collides(a)
-        elif isinstance(a, Shield):
-            return a.collides(b)
-        else:
-            return True
+    if isinstance(b, Shield):
+        return b.collides(a)
+    elif isinstance(a, Shield):
+        return a.collides(b)
     else:
-        return False
+        return dist2(a.pos, b.pos) < (a.radius + b.radius)**2
 
 
 class CollisionHandler:
