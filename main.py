@@ -8,6 +8,7 @@ from constants import (
 )
 from glob import globs
 
+from assets import load_assets
 from utils import FlexObj, Debug
 from action import ActionStates, handler
 from collision_handler import CollisionHandler
@@ -220,6 +221,7 @@ def main():
     pygame.joystick.init()
 
     screen = pygame.display.set_mode((W, H), flags=pygame.RESIZABLE | pygame.SCALED)
+    load_assets()
 
     game_state = {
         'score': 0,
