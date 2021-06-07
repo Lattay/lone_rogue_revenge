@@ -161,9 +161,9 @@ def run_level(game_state, screen, level_name):
 
     collision_handlers = [
         CollisionHandler(hero, enemy, solid, enemy_bullet),
-        CollisionHandler(enemy_bullet, solid, enemy),
-        CollisionHandler(ally_bullet, hero, solid, enemy),
-        CollisionHandler(enemy, solid),
+        CollisionHandler(enemy, solid, enemy_bullet, ally_bullet),
+        CollisionHandler(enemy_bullet, solid),
+        CollisionHandler(ally_bullet, solid),
     ]
 
     next_state = None
