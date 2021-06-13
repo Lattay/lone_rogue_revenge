@@ -22,6 +22,10 @@ class Entity(Actor, Sprite):
         self.size = (0, 0)
         self.mask = Mask((int(1.5 * self.radius), int(1.5 * self.radius)), fill=True)
         self._update_rect()
+        self._skip_update = False
+
+    def skip_update(self):
+        self._skip_update = True
 
     def score(self):
         globs.score += self.value
@@ -30,8 +34,16 @@ class Entity(Actor, Sprite):
         pass
 
     def update(self):
-        self.up()
-        self._update_rect()
+        if not self._skip_update:
+            self._handle_messages()
+            self.up()
+            self._update_rect()
+
+    def _handle_messages(self):
+        for sender, msg, data in self.get_messages():
+            handler = getattr(self, "on_" + msg, None)
+            if handler:
+                handler(sender, *data)
 
     def _update_rect(self):
         rx, ry = globs.camera

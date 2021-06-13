@@ -100,22 +100,25 @@ class Enemy(Ship):
         Explosion(*self.pos, globs.groups.visible)
         self.kill()
 
-    def up(self):
+    def on_hit(self, sender):
+        if isinstance(sender, HeroBullet):
+            self.score()
+            self.destroy()
+            self.skip_update()
+        elif not isinstance(sender, Bullet):
+            self.destroy()
+            self.skip_update()
+
+    def on_disband(self, _):
         if self.state == EnemyState.FOLLOWING:
-            for sender, msg, data in self.get_messages():
-                if msg == "hit":
-                    if isinstance(sender, HeroBullet):
-                        self.score()
-                        self.destroy()
-                        return
-                    elif not isinstance(sender, Bullet):
-                        self.destroy()
-                        return
-                elif msg == "disband":
-                    self.transit(EnemyState.FLEEING)
-                elif msg == "changedir":
-                    self.direction = data[0]
-        else:
+            self.transit(EnemyState.FLEEING)
+
+    def on_changedir(self, _, direction):
+        if self.state == EnemyState.FOLLOWING:
+            self.direction = direction
+
+    def up(self):
+        if self.state != EnemyState.FOLLOWING:
             if self.state == EnemyState.FLEEING:
                 h = globs.groups.hero.sprite
                 if h and dist2(h.pos, self.pos) > despawn_dist2:
@@ -129,16 +132,6 @@ class Enemy(Ship):
                 self.direction = d
                 self.direction_cooldown = tk + self.direction_cooldown_length
 
-            for sender, msg, data in self.get_messages():
-                if msg == "hit":
-                    if isinstance(sender, HeroBullet):
-                        self.score()
-                        self.destroy()
-                        return
-                    elif not isinstance(sender, Bullet):
-                        self.destroy()
-                        return
-
         self.move_toward(self.direction)
 
         if self.want_to_shoot():
@@ -146,51 +139,49 @@ class Enemy(Ship):
 
 
 def leader(Cls):
-    def up(self):
-        for sender, msg, data in self.get_messages():
-            if msg == "hit":
-                squad = self.squad.sprites()
-                if squad:
-                    for member in self.squad:
-                        self.send(member, "disband")
-                if isinstance(sender, HeroBullet):
-                    if not squad:
-                        self.value = 3 * self.value
-                    self.score()
-                    self.destroy()
-                    return
-                elif not isinstance(sender, Bullet):
-                    self.destroy()
-                    return
+    class Wrapper(Cls):
+        value = Cls.value + 50
 
-        tk = get_ticks()
+        def __init__(self, *args, **kwargs):
+            super().__init__(*args, **kwargs)
+            self.squad = Group()
+            spawn_squad(self)
+            self.transit(EnemyState.AGGRO)
 
-        if tk > self.direction_cooldown:
-            d = self.pick_direction()
-            if not d:
-                d = self.wander()
-            self.direction = d
-            self.direction_cooldown = tk + self.direction_cooldown_length
-            for member in self.squad:
-                self.send(member, "changedir", d)
+        def on_hit(self, sender):
+            squad = self.squad.sprites()
+            if squad:
+                for member in self.squad:
+                    self.send(member, "disband")
+            if isinstance(sender, HeroBullet):
+                if not squad:
+                    self.value = 3 * self.value
+                self.score()
+                self.destroy()
+                self.skip_update()
+            elif not isinstance(sender, Bullet):
+                self.destroy()
+                self.skip_update()
 
-        self.move_toward(self.direction)
+        def up(self):
+            tk = get_ticks()
+
+            if tk > self.direction_cooldown:
+                d = self.pick_direction()
+                if not d:
+                    d = self.wander()
+                self.direction = d
+                self.direction_cooldown = tk + self.direction_cooldown_length
+                for member in self.squad:
+                    self.send(member, "changedir", d)
+
+            self.move_toward(self.direction)
 
     def spawn_squad(self):
         for i in range(4):
             pos = self.pos + Vector2(1, 1).rotate(i * 90) * Z * 16
             m = self.Member(*pos, self.squad, *self.groups())
             m.transit(EnemyState.FOLLOWING)
-
-    Cls.up = up
-    Cls.value = Cls.value + 50
-
-    def Wrapper(*args, **kwargs):
-        instance = Cls(*args, **kwargs)
-        instance.squad = Group()
-        spawn_squad(instance)
-        instance.transit(EnemyState.AGGRO)
-        return instance
 
     return Wrapper
 
@@ -308,17 +299,16 @@ class Mothership(Entity):
         self.shields[0].destroy()
         self.shields[1].destroy()
 
-    def up(self):
-        for sender, msg, data in self.get_messages():
-            if msg == "hit":
-                if isinstance(sender, HeroBullet):
-                    self.score()
-                    self.destroy()
-                    return
-                elif not isinstance(sender, Bullet):
-                    self.destroy()
-                    return
+    def on_hit(self, sender):
+        if isinstance(sender, HeroBullet):
+            self.score()
+            self.destroy()
+            self.skip_update()
+        elif not isinstance(sender, Bullet):
+            self.destroy()
+            self.skip_update()
 
+    def up(self):
         self.tick += 1
         if self.tick >= 40:
             self.tick = 0
@@ -379,17 +369,16 @@ class Satellites(Entity):
         self.size = self.image.get_rect().size
         self.bullet_group = globs.groups.enemy_bullet
 
-    def up(self):
-        for sender, msg, data in self.get_messages():
-            if msg == "hit":
-                if isinstance(sender, HeroBullet):
-                    self.score()
-                    self.destroy()
-                    return
-                elif not isinstance(sender, Bullet):
-                    self.destroy()
-                    return
+    def on_hit(self, sender):
+        if isinstance(sender, HeroBullet):
+            self.score()
+            self.destroy()
+            self.skip_update()
+        elif not isinstance(sender, Bullet):
+            self.destroy()
+            self.skip_update()
 
+    def up(self):
         hero = globs.groups.hero.sprite
         if hero and dist2(self.pos, hero.pos) < shoot_dist2:
             if self.shared.shoot_cooldown < get_ticks():

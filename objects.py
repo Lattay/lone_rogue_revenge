@@ -11,17 +11,12 @@ from assets import get_animation, get_sprite
 
 
 class Destructible(Entity):
-    explode = True
-
-    def up(self):
-        for sender, msg, data in self.get_messages():
-            if msg == "hit":
-                if isinstance(sender, HeroBullet):
-                    self.score()
-                if self.explode:
-                    Explosion(*self.pos, globs.groups.visible)
-                self.kill()
-                return
+    def on_hit(self, sender):
+        if isinstance(sender, HeroBullet):
+            self.score()
+        Explosion(*self.pos, globs.groups.visible)
+        self.kill()
+        self.skip_update()
 
 
 class Rock(Destructible):
@@ -50,7 +45,6 @@ class Mine(Destructible):
 class Bullet(Destructible):
     radius = Z * 1
     speed = 6.0
-    explode = False
 
     def __init__(self, toward, x, y, *args, **kwargs):
         super().__init__(x, y, self.bullet_group(), *args, **kwargs)
@@ -65,6 +59,10 @@ class Bullet(Destructible):
 
     def bullet_group(self):
         return globs.groups.enemy_bullet
+
+    def on_hit(self, sender):
+        self.kill()
+        self.skip_update()
 
     def up(self):
         x, y = self.pos
