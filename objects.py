@@ -13,8 +13,7 @@ from assets import get_animation, get_sprite
 class Destructible(Entity):
     explode = True
 
-    def update(self):
-        super().update()
+    def up(self):
         for sender, msg in self.get_messages():
             if msg == "hit":
                 if isinstance(sender, HeroBullet):
@@ -67,8 +66,7 @@ class Bullet(Destructible):
     def bullet_group(self):
         return globs.groups.enemy_bullet
 
-    def update(self):
-        super().update()
+    def up(self):
         x, y = self.pos
         self.pos = Vector2(x + self.dx, y + self.dy)
         self.anim_counter += 1
@@ -103,8 +101,7 @@ class Explosion(Entity):
         self.size = self.image.get_rect().size
         self.anim_counter = 0
 
-    def update(self):
-        super().update()
+    def up(self):
         self.anim_counter += 1
         a = self.anim_counter // 4
         if a == len(self.animation):

@@ -21,18 +21,25 @@ class Entity(Actor, Sprite):
         self.pos = Vector2(x, y)
         self.size = (0, 0)
         self.mask = Mask((int(1.5 * self.radius), int(1.5 * self.radius)), fill=True)
-        self.update_rect()
+        self._update_rect()
 
     def score(self):
         globs.score += self.value
 
-    def update(self):
-        self.update_rect()
+    def up(self):
+        pass
 
-    def update_rect(self):
+    def update(self):
+        self.up()
+        self._update_rect()
+
+    def _update_rect(self):
         rx, ry = globs.camera
         x, y = self.pos
         wx = wrap(x - rx)
         wy = wrap(y - ry)
         self.rect = Rect((0, 0), self.size)
         self.rect.center = (wx + W / 2, wy + H / 2)
+
+    def on_screen(self):
+        pass

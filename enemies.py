@@ -100,7 +100,7 @@ class Enemy(Ship):
         Explosion(*self.pos, globs.groups.visible)
         self.kill()
 
-    def update(self):
+    def up(self):
         if self.state == EnemyState.FOLLOWING:
             for sender, msg in self.get_messages():
                 if msg == "hit":
@@ -146,11 +146,9 @@ class Enemy(Ship):
         if self.want_to_shoot():
             self.shoot(self.direction)
 
-        self.update_rect()
-
 
 def leader(Cls):
-    def update(self):
+    def up(self):
         for sender, msg in self.get_messages():
             if msg == "hit":
                 squad = self.squad.sprites()
@@ -179,7 +177,6 @@ def leader(Cls):
                 self.send(member, ("changedir", d))
 
         self.move_toward(self.direction)
-        self.update_rect()
 
     def spawn_squad(self):
         for i in range(4):
@@ -187,7 +184,7 @@ def leader(Cls):
             m = self.Member(*pos, self.squad, *self.groups())
             m.transit(EnemyState.FOLLOWING)
 
-    Cls.update = update
+    Cls.up = up
     Cls.value = Cls.value + 50
 
     def Wrapper(*args, **kwargs):
@@ -313,7 +310,7 @@ class Mothership(Entity):
         self.shields[0].destroy()
         self.shields[1].destroy()
 
-    def update(self):
+    def up(self):
         for sender, msg in self.get_messages():
             if msg == "hit":
                 if isinstance(sender, HeroBullet):
@@ -334,8 +331,6 @@ class Mothership(Entity):
             self.score()
             self.destroy()
             return
-
-        super().update()
 
 
 class Shield(Entity):
@@ -386,7 +381,7 @@ class Satellites(Entity):
         self.size = self.image.get_rect().size
         self.bullet_group = globs.groups.enemy_bullet
 
-    def update(self):
+    def up(self):
         for sender, msg in self.get_messages():
             if msg == "hit":
                 if isinstance(sender, HeroBullet):
@@ -403,8 +398,6 @@ class Satellites(Entity):
                 self.shared.shoot_cooldown = get_ticks() + satellite_shooting_rate
                 x, y = Vector2(hero.pos) - Vector2(self.pos)
                 self.shoot((wrap(x), wrap(y)))
-
-        super().update()
 
     def destroy(self):
         Explosion(*self.pos, globs.groups.visible)
@@ -427,7 +420,7 @@ class Spawner(Sprite):
         self.image = Surface((0, 0))
         self.rect = Rect(0, 0, 0, 0)
 
-    def update(self):
+    def up(self):
         r = random.random()
         if r < globs.spawn_proba:
             RandomClass(*self.pos, globs.groups.visible, globs.groups.enemy)
