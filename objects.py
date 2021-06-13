@@ -14,7 +14,7 @@ class Destructible(Entity):
     explode = True
 
     def up(self):
-        for sender, msg in self.get_messages():
+        for sender, msg, data in self.get_messages():
             if msg == "hit":
                 if isinstance(sender, HeroBullet):
                     self.score()

@@ -24,7 +24,7 @@ class Hero(Ship):
 
     def up(self):
         # ===== React to messages =====
-        for sender, msg in self.get_messages():
+        for sender, msg, data in self.get_messages():
             if msg == "hit":
                 if not isinstance(sender, HeroBullet):
                     Explosion(*self.pos, globs.groups.visible)

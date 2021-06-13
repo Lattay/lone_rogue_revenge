@@ -13,14 +13,14 @@ class Actor:
         self._mailbox = []
 
     @staticmethod
-    def send_to(dest, msg):
-        dest._recv(None, msg)
+    def send_to(dest, msg, *data):
+        dest._recv(None, msg, data)
 
-    def send(self, dest, msg):
-        dest._recv(self, msg)
+    def send(self, dest, msg, *data):
+        dest._recv(self, msg, data)
 
-    def _recv(self, sender, msg):
-        self._mailbox.append((sender, msg))
+    def _recv(self, sender, msg, data):
+        self._mailbox.append((sender, msg, data))
 
     def get_messages(self):
         yield from self._mailbox

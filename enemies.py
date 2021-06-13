@@ -102,7 +102,7 @@ class Enemy(Ship):
 
     def up(self):
         if self.state == EnemyState.FOLLOWING:
-            for sender, msg in self.get_messages():
+            for sender, msg, data in self.get_messages():
                 if msg == "hit":
                     if isinstance(sender, HeroBullet):
                         self.score()
@@ -113,10 +113,8 @@ class Enemy(Ship):
                         return
                 elif msg == "disband":
                     self.transit(EnemyState.FLEEING)
-                elif isinstance(msg, tuple):
-                    label, data = msg
-                    if label == "changedir":
-                        self.direction = data
+                elif msg == "changedir":
+                    self.direction = data[0]
         else:
             if self.state == EnemyState.FLEEING:
                 h = globs.groups.hero.sprite
@@ -131,7 +129,7 @@ class Enemy(Ship):
                 self.direction = d
                 self.direction_cooldown = tk + self.direction_cooldown_length
 
-            for sender, msg in self.get_messages():
+            for sender, msg, data in self.get_messages():
                 if msg == "hit":
                     if isinstance(sender, HeroBullet):
                         self.score()
@@ -149,7 +147,7 @@ class Enemy(Ship):
 
 def leader(Cls):
     def up(self):
-        for sender, msg in self.get_messages():
+        for sender, msg, data in self.get_messages():
             if msg == "hit":
                 squad = self.squad.sprites()
                 if squad:
@@ -174,7 +172,7 @@ def leader(Cls):
             self.direction = d
             self.direction_cooldown = tk + self.direction_cooldown_length
             for member in self.squad:
-                self.send(member, ("changedir", d))
+                self.send(member, "changedir", d)
 
         self.move_toward(self.direction)
 
@@ -311,7 +309,7 @@ class Mothership(Entity):
         self.shields[1].destroy()
 
     def up(self):
-        for sender, msg in self.get_messages():
+        for sender, msg, data in self.get_messages():
             if msg == "hit":
                 if isinstance(sender, HeroBullet):
                     self.score()
@@ -382,7 +380,7 @@ class Satellites(Entity):
         self.bullet_group = globs.groups.enemy_bullet
 
     def up(self):
-        for sender, msg in self.get_messages():
+        for sender, msg, data in self.get_messages():
             if msg == "hit":
                 if isinstance(sender, HeroBullet):
                     self.score()
