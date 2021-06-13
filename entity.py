@@ -21,6 +21,7 @@ class Entity(Actor, Sprite):
         self.pos = Vector2(x, y)
         self.size = (0, 0)
         self.mask = Mask((int(1.5 * self.radius), int(1.5 * self.radius)), fill=True)
+        self.ticks = 0
         self._update_rect()
         self._skip_update = False
 
@@ -38,6 +39,7 @@ class Entity(Actor, Sprite):
             self._handle_messages()
             self.up()
             self._update_rect()
+            self.ticks += 1
 
     def _handle_messages(self):
         for sender, msg, data in self.get_messages():

@@ -4,9 +4,8 @@ from pygame.event import custom_type
 W, H = 1280, 720  # Canvas size
 Z = 4  # Zoom
 
-FIELD_SIZE_SPRITE = 32
+FIELD_SIZE_SPRITE = 50
 FIELD_SIZE = FIELD_SIZE_SPRITE * Z * 16
-BULLET_DIST = FIELD_SIZE * 0.45
 
 DEADZONE = 0.2  # Joystick trigger
 

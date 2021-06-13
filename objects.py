@@ -4,7 +4,7 @@ import random
 from pygame import transform
 from pygame.math import Vector2
 
-from constants import Z, BULLET_DIST
+from constants import Z
 from glob import globs
 from entity import Entity
 from assets import get_animation, get_sprite
@@ -50,7 +50,6 @@ class Bullet(Destructible):
         super().__init__(x, y, self.bullet_group(), *args, **kwargs)
         self.animation = get_animation("bullet")
         self.image = self.animation[0]
-        self.anim_counter = 0
         self.size = self.image.get_rect().size
         dx, dy = toward
         n = math.hypot(dx, dy)
@@ -67,9 +66,8 @@ class Bullet(Destructible):
     def up(self):
         x, y = self.pos
         self.pos = Vector2(x + self.dx, y + self.dy)
-        self.anim_counter += 1
-        self.image = self.animation[(self.anim_counter // 12) % 2]
-        if self.anim_counter > BULLET_DIST / self.speed:
+        self.image = self.animation[(self.ticks // 12) % 2]
+        if not self.on_screen():
             self.kill()
 
 
@@ -97,11 +95,9 @@ class Explosion(Entity):
         self.animation = [transform.rotate(f, r) for f in get_animation("explosion")]
         self.image = self.animation[0]
         self.size = self.image.get_rect().size
-        self.anim_counter = 0
 
     def up(self):
-        self.anim_counter += 1
-        a = self.anim_counter // 4
+        a = self.ticks // 4
         if a == len(self.animation):
             self.kill()
         else:

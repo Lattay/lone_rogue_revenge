@@ -274,7 +274,6 @@ class Mothership(Entity):
         self.image = self.images[0]
         self.size = self.image.get_rect().size
         self.i = 0
-        self.tick = 0
         self.satellites = Group()
         r = Z * 32
         p = Vector2(*self.pos)
@@ -309,9 +308,8 @@ class Mothership(Entity):
             self.skip_update()
 
     def up(self):
-        self.tick += 1
-        if self.tick >= 40:
-            self.tick = 0
+        if self.ticks >= 40:
+            self.ticks = 0
             self.i = 1 - self.i
             self.image = self.images[self.i]
 

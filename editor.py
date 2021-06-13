@@ -219,7 +219,6 @@ class Anchor(Entity):
                 for f in get_animation(sprite)
             ]
             self.image = self.images[0]
-            self.anim_counter = 0
         else:
             self.anim = False
             self.image = transform.rotate(get_sprite(sprite), rot)
@@ -249,8 +248,7 @@ class Anchor(Entity):
             self.prev_pos = pygame.mouse.get_pos()
 
         if self.anim:
-            self.anim_counter += 1
-            self.image = self.images[(self.anim_counter // 6) % len(self.images)]
+            self.image = self.images[(self.ticks // 6) % len(self.images)]
 
         if self.clicked(left=False):
             self.kill()
