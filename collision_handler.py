@@ -20,22 +20,29 @@ class CollisionHandler:
         self.groups = groups
 
     def handle_collisions(self):
-        c = {}
+        a = {
+            e for e in self.target
+            if e.on_screen()
+        }
+        b = set()
         for g in self.groups:
-            c.update(
-                groupcollide(
-                    self.target,
-                    g,
-                    False,
-                    False,
-                    collided=collide,
-                )
-            )
+            b.update({
+                e for e in g
+                if e.on_screen()
+            })
 
         all_collided = set()
-        for t, collection in c.items():
-            first, *_ = collection
-            first.send(t, "hit")
-            for o in set(collection).difference(all_collided):
-                t.send(o, "hit")
-            all_collided.update(collection)
+        for t in a:
+            colliding = {
+                e for e in b
+                if collide(t, e)
+            }
+
+            if colliding:
+                for o in colliding.difference(all_collided):
+                    t.send(o, "hit")
+
+                first, *_ = colliding
+                first.send(t, "hit")
+                all_collided.update(colliding)
+                all_collided.add(t)

@@ -54,4 +54,5 @@ class Entity(Actor, Sprite):
         self.rect.center = (wx + W / 2, wy + H / 2)
 
     def on_screen(self):
-        pass
+        screen = Rect(0, 0, W, H)
+        return screen.colliderect(self.rect)

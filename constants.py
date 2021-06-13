@@ -43,6 +43,6 @@ NEXT_LEVEL_STATE = 3
 WIN_STATE = 4
 
 LEVELS = (
-    "assets/level1.json",
     "assets/level2.json",
+    "assets/level1.json",
 )
