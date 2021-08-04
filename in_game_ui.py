@@ -9,12 +9,12 @@ from ui import Ui, Manager, UiMaster
 
 
 def setup_in_game_ui(group):
-    x = W - Z * (4 * 16 + 8)
-    y = Z * 8
+    mm_x = W - Z * (4 * 16 + 8)
+    mm_y = H - Z * (4 * 16 + 8)
 
     managers = [
-        init_minimap(x, y, group),
-        init_life_bar(x, y + 4 * 16 * Z, group),
+        init_minimap(mm_x, mm_y, group),
+        init_life_bar(mm_x, mm_y - Z * 16, group),
     ]
 
     return UiMaster([m for m in managers if m is not None], group)
@@ -112,7 +112,8 @@ class Life(Ui):
         size = self.image.get_size()
         self.i = i
         self.n = n
-        super().__init__(0, y, *size, *args, **kwargs)
+        super().__init__(0, 0, *size, *args, **kwargs)
+        self.rect.centery = y
         self.on_update_pos(None, n)
 
     def on_die(self, _):

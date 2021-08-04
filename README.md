@@ -23,7 +23,14 @@ The game is written with Python and Pygame.
     - [X] level to level
     - [ ] level to game over
 - [ ] some levels
-- [ ] in game UI
+- [o] in game UI
+    - [X] lives counter
+    - [X] minimap
+    - [X] pause
+    - [ ] exit from pause
+    - [ ] restart level from pause
+    - [ ] score
+    - [ ] score changes
 - [ ] game phases (calm, spy approaching, red alert)
 - [ ] menus
 - [ ] sound FX

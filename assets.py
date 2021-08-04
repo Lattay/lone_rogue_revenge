@@ -26,6 +26,7 @@ def load_assets():
         "mm_mothership": scale_up(_sheet.subsurface(Rect(0, 116, 4, 4))),
         "mm_corner": scale_up(_sheet.subsurface(Rect(16, 112, 16, 16))),
         "mm_side": scale_up(_sheet.subsurface(Rect(32, 112, 16, 16))),
+        "ui_pause": scale_up(_sheet.subsurface(Rect(48, 112, 64, 16))),
     }
 
     animated = {

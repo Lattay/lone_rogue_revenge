@@ -7,7 +7,7 @@ Z = 4  # Zoom
 FIELD_SIZE_SPRITE = 50
 FIELD_SIZE = FIELD_SIZE_SPRITE * Z * 16
 
-DEADZONE = 0.2  # Joystick trigger
+DEADZONE = 0.1  # Joystick trigger
 
 # Colors (palette pink_ink)
 WHITE = (255, 255, 255)

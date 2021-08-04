@@ -14,6 +14,8 @@ from action import ActionStates, handler
 from collision_handler import CollisionHandler
 from hero import reset, save_hero_state
 
+from pause import setup_pause_screen
+
 
 from scene_tools import load_level
 
@@ -111,7 +113,7 @@ def key_back(_, event):
 
 
 @handler.register(pygame.KEYDOWN, "debug")
-def key_back(_, event):
+def key_debug(_, event):
     return event.key == key_map["debug"]
 
 
@@ -144,29 +146,27 @@ def run_level(game_state, screen, level_name):
 
     globs.camera = Vector2(0, 0)
 
-    visible = pygame.sprite.Group()
-    ui = pygame.sprite.Group()
-    ally_bullet = pygame.sprite.Group()
-    enemy_bullet = pygame.sprite.Group()
-    enemy = pygame.sprite.Group()
-    solid = pygame.sprite.Group()
-    mothership = pygame.sprite.Group()
-    hero = pygame.sprite.GroupSingle()
     globs.groups = FlexObj()
-    globs.groups.visible = visible
-    globs.groups.ui = ui
-    globs.groups.ally_bullet = ally_bullet
-    globs.groups.enemy_bullet = enemy_bullet
-    globs.groups.enemy = enemy
-    globs.groups.solid = solid
-    globs.groups.hero = hero
-    globs.groups.mothership = mothership
+    globs.groups.visible = visible = pygame.sprite.Group()
+    globs.groups.ui = ui = pygame.sprite.Group()
+    globs.groups.pause = pause = pygame.sprite.Group()
+
+    globs.groups.ally_bullet = ally_bullet = pygame.sprite.Group()
+    globs.groups.enemy_bullet = enemy_bullet = pygame.sprite.Group()
+    globs.groups.enemy = enemy = pygame.sprite.Group()
+    globs.groups.solid = solid = pygame.sprite.Group()
+    globs.groups.hero = hero = pygame.sprite.GroupSingle()
+    globs.groups.mothership = mothership = pygame.sprite.Group()
 
     globs.spawn_proba = max_spawn_rate
+
+    globs.pause = False
 
     globs.debug = db = Debug()
     load_level(level_name, visible, ally_bullet,
                enemy_bullet, enemy, solid, hero, mothership)
+
+    setup_pause_screen(pause)
 
     ui_master = setup_in_game_ui(ui)
 
@@ -194,7 +194,10 @@ def run_level(game_state, screen, level_name):
         if actions.reload:
             reset()
 
-        if actions.debug:
+        if actions.ui_select:
+            globs.pause = not globs.pause
+
+        if DEBUG and actions.debug:
             globs.life += 1
 
         elif actions.loose:
@@ -210,17 +213,22 @@ def run_level(game_state, screen, level_name):
         for h in collision_handlers:
             h.handle_collisions()
 
-        # update
-        visible.update()
-        globs.spawn_proba = max_spawn_rate / (1 + len(enemy.sprites()))
+        if not globs.pause:
+            # update
+            visible.update()
+            globs.spawn_proba = max_spawn_rate / (1 + len(enemy.sprites()))
 
-        ui_master.update()
+            ui_master.update()
 
         # draw
         screen.fill(BLACK)
 
         visible.draw(screen)
         ui.draw(screen)
+
+        if globs.pause:
+            pause.draw(screen)
+
         globs.debug.debug(f"hero life: {globs.life}")
         globs.debug.debug(f"score: {globs.score}")
 
