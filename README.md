@@ -1,8 +1,8 @@
-# Rogue Ship Return
+# Lone Rogue Revenge
 
 ## About
 
-*Rogue Ship Return* is a space top down shooter heavily inspired by the arcade game Bosconian from Namco (1981).
+*Lone Rogue Revenge* is a space top down shooter heavily inspired by the arcade game Bosconian from Namco (1981).
 
 It is mostly a clone, but I don't try to make it accurate at all.
 I just think most choices in the original game where goods.
