@@ -21,6 +21,11 @@ def load_assets():
         "fighter": scale_up(_sheet.subsurface(Rect(32, 0, 16, 16))),
         "fighter_leader": scale_up(_sheet.subsurface(Rect(96, 0, 16, 16))),
         "shield": scale_up(_sheet.subsurface(Rect(0, 80, 48, 16))),
+        # UI
+        "mm_hero": scale_up(_sheet.subsurface(Rect(0, 112, 4, 4))),
+        "mm_mothership": scale_up(_sheet.subsurface(Rect(0, 116, 4, 4))),
+        "mm_corner": scale_up(_sheet.subsurface(Rect(16, 112, 16, 16))),
+        "mm_side": scale_up(_sheet.subsurface(Rect(32, 112, 16, 16))),
     }
 
     animated = {
