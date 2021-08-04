@@ -13,21 +13,26 @@ def setup_in_game_ui(group):
 
 
 def init_minimap(group):
-    x, y = int(0.8 * W), int(0.2 * H)
+    y = Z * 8
+    x = W - Z * (4 * 16 + 8)
+
+    # center
+    cx, cy = x + Z * 2 * 16, y + Z * 2 * 16
+
     _ = [
-        MmCorner(x, y, i, group)
+        MmCorner(cx, cy, i, group)
         for i in range(4)
     ]
     _ = [
-        MmSide(x, y, i, j, group)
+        MmSide(cx, cy, i, j, group)
         for i in range(4)
         for j in range(2)
     ]
 
     for m in globs.groups.mothership:
-        MmMothership(x, y, m, group)
+        MmMothership(cx, cy, m, group)
 
-    MmHero(x, y, globs.groups.hero, group)
+    MmHero(cx, cy, globs.groups.hero, group)
 
 
 class MmCorner(Ui):
