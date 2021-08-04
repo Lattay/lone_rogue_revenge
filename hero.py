@@ -1,7 +1,7 @@
 from pygame.time import get_ticks, set_timer
 from pygame.math import Vector2
 
-from constants import Z, RESET_PLAYER, LOOSE, DEBUG
+from constants import Z, RESET_PLAYER, LOOSE
 from glob import globs
 
 from ship import Ship
@@ -61,13 +61,12 @@ def plan_event(event_type, t):
 
 def reset():
     globs.life -= 1
+    globs.camera = Vector2(globs.starter_pos)
 
     h = Hero(*globs.starter_pos, globs.groups.visible, globs.groups.hero)
     h.look_toward(globs.starter_dir)
 
-    globs.camera = globs.starter_pos
-
 
 def save_hero_state(globs, hero):
-    globs.starter_pos = Vector2(hero.pos)
+    globs.starter_pos = tuple(hero.pos)
     globs.starter_dir = tuple(hero.direction)
