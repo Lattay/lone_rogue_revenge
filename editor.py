@@ -9,9 +9,9 @@ from pygame.math import Vector2
 from constants import W, H, BLACK
 from glob import globs
 from action import ActionStates, handler
-from assets import get_animation, get_sprite, sprite_sheet, animated
+from assets import get_animation, get_sprite, get_all_assets, load_assets
 from entity import Entity
-from utils import wrap
+from utils import wrap, Debug
 
 
 key_map = {
@@ -100,12 +100,13 @@ def main(filename):
     screen = pygame.display.set_mode((W, H), flags=pygame.RESIZABLE | pygame.SCALED)
     clock = pygame.time.Clock()
 
-    db = globs.debug
+    load_assets()
 
     globs.camera = (0, 0)
 
     visible = pygame.sprite.Group()
     globs.group_all = visible
+    globs.debug = db = Debug()
 
     world = World(filename)
 
@@ -143,7 +144,8 @@ class World:
     def __init__(self, filename):
         self.filename = filename
         self.dir = 0
-        self.sprites = get_all_assets()
+        self.sprites_dict = get_all_assets()
+        self.sprites = list(self.sprites_dict)
         self.sprite = self.sprites[0]
         self.sprite_index = 0
         self.load()
@@ -159,6 +161,19 @@ class World:
             for pos, rot in lst:
                 self.spawn(sprite, pos, rot)
 
+    def dump(self):
+        anchors = (sp for sp in globs.group_all if isinstance(sp, Anchor))
+        d = {}
+
+        for a in anchors:
+            x, y = a.pos
+            d.setdefault(a.sprite, []).append(
+                ((wrap(x), wrap(y)), a.rot)
+            )
+
+        with open(self.filename + ".new", "w") as f:
+            json.dump(d, f)
+
     def spawn(self, sprite, pos, rot):
         Anchor(sprite, rot, *pos, globs.group_all)
 
@@ -172,7 +187,7 @@ class World:
             self.spawn(self.sprite, globs.camera, self.dir * 90)
 
         if act.save:
-            dump(sp for sp in globs.group_all if isinstance(sp, Anchor))
+            self.dump()
 
         if act.next_sprite:
             self.sprite_index = (self.sprite_index + 1) % len(self.sprites)
@@ -192,7 +207,7 @@ class World:
         globs.debug.debug(f"current sprite: {self.sprite}")
 
     def draw_ui(self, screen):
-        if get_type_asset(self.sprite) == "anim":
+        if self.sprites_dict[self.sprite] == "anim":
             im = get_animation(self.sprite)[0]
         else:
             im = get_sprite(self.sprite)
@@ -212,7 +227,7 @@ class Anchor(Entity):
 
         self.sprite = sprite
 
-        if get_type_asset(sprite) == "anim":
+        if get_all_assets()[sprite] == "anim":
             self.anim = True
             self.images = [
                 transform.rotate(f, rot)
@@ -252,30 +267,6 @@ class Anchor(Entity):
 
         if self.clicked(left=False):
             self.kill()
-
-
-def get_type_asset(name):
-    if name in animated:
-        return "anim"
-    else:
-        return "static"
-
-
-def get_all_assets():
-    return list(sprite_sheet) + list(animated)
-
-
-def dump(anchors):
-    d = {}
-
-    for a in anchors:
-        x, y = a.pos
-        d.setdefault(a.sprite, []).append(
-            ((wrap(x), wrap(y)), a.rot)
-        )
-
-    with open("level_dump.json", "w") as f:
-        json.dump(d, f)
 
 
 if __name__ == "__main__":

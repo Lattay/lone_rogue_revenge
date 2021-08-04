@@ -3,11 +3,6 @@ from pygame.rect import Rect
 from constants import Z
 
 
-def scale_up(surf):
-    w, h = surf.get_size()
-    return pygame.transform.scale(surf, (Z * w, Z * h))
-
-
 _sheet = None
 sprite_sheet = None
 animated = None
@@ -62,3 +57,14 @@ def get_sprite(name):
 
 def get_animation(name):
     return animated[name]
+
+
+def scale_up(surf):
+    w, h = surf.get_size()
+    return pygame.transform.scale(surf, (Z * w, Z * h))
+
+
+def get_all_assets():
+    d = {k: "static" for k in sprite_sheet}
+    d.update({k: "anim" for k in animated})
+    return d
