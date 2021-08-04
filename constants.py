@@ -44,4 +44,5 @@ WIN_STATE = 4
 LEVELS = (
     "assets/level1.json",
     "assets/level2.json",
+    "assets/level3.json",
 )

@@ -26,6 +26,12 @@ class Actor:
         yield from self._mailbox
         self._mailbox.clear()
 
+    def _handle_messages(self):
+        for sender, msg, data in self.get_messages():
+            handler = getattr(self, "on_" + msg, None)
+            if handler:
+                handler(sender, *data)
+
 
 def wrap(a):
     return (a + 0.5 * FIELD_SIZE) % FIELD_SIZE - 0.5 * FIELD_SIZE

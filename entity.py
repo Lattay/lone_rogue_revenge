@@ -11,7 +11,10 @@ screen = Rect(0, 0, W, H)
 
 
 class Entity(Actor, Sprite):
-    """An actor that is drawable. It has a position and a size."""
+    """An actor that is drawable.
+
+    It has a position in the world referencial and a size.
+    """
 
     radius = 0.0
     value = 0
@@ -42,12 +45,6 @@ class Entity(Actor, Sprite):
             self.up()
             self._update_rect()
             self.ticks += 1
-
-    def _handle_messages(self):
-        for sender, msg, data in self.get_messages():
-            handler = getattr(self, "on_" + msg, None)
-            if handler:
-                handler(sender, *data)
 
     def _update_rect(self):
         rx, ry = globs.camera

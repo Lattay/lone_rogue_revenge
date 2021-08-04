@@ -14,7 +14,10 @@ from action import ActionStates, handler
 from collision_handler import CollisionHandler
 from hero import reset, save_hero_state
 
+
 from scene_tools import load_level
+
+from in_game_ui import setup_in_game_ui
 
 max_spawn_rate = 0.015
 
@@ -136,6 +139,7 @@ def run_level(game_state, screen, level_name):
     globs.camera = Vector2(0, 0)
 
     visible = pygame.sprite.Group()
+    ui = pygame.sprite.Group()
     ally_bullet = pygame.sprite.Group()
     enemy_bullet = pygame.sprite.Group()
     enemy = pygame.sprite.Group()
@@ -144,6 +148,7 @@ def run_level(game_state, screen, level_name):
     hero = pygame.sprite.GroupSingle()
     globs.groups = FlexObj()
     globs.groups.visible = visible
+    globs.groups.ui = ui
     globs.groups.ally_bullet = ally_bullet
     globs.groups.enemy_bullet = enemy_bullet
     globs.groups.enemy = enemy
@@ -156,6 +161,8 @@ def run_level(game_state, screen, level_name):
     globs.debug = db = Debug()
     load_level(level_name, visible, ally_bullet,
                enemy_bullet, enemy, solid, hero, mothership)
+
+    setup_in_game_ui(ui)
 
     save_hero_state(globs, hero.sprite)
 
@@ -196,10 +203,13 @@ def run_level(game_state, screen, level_name):
         visible.update()
         globs.spawn_proba = max_spawn_rate / (1 + len(enemy.sprites()))
 
+        ui.update()
+
         # draw
         screen.fill(BLACK)
 
         visible.draw(screen)
+        ui.draw(screen)
         globs.debug.debug(f"hero life: {globs.life}")
         globs.debug.debug(f"score: {globs.score}")
 
