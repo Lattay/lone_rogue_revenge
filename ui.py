@@ -45,3 +45,17 @@ class UiMaster(Manager):
 
         for m in self.children:
             m.update()
+
+
+class Button(Ui):
+    def __init__(self, x, y, w, h, manager, *args, **kwargs):
+        super().__init__(x, y, w, h, *args, **kwargs)
+        self.pressed = True
+        self.manager = manager
+
+    def on_select(self, _):
+        self.pressed = True
+        self.send(self.manager, "play_pressed")
+
+    def on_deselect(self, _):
+        self.pressed = False

@@ -28,9 +28,6 @@ class EventHandler:
                         setattr(state, action, True)
 
 
-handler = EventHandler()
-
-
 class ActionStates:
     def __init__(self):
         super().__init__()
