@@ -5,16 +5,22 @@ from constants import W, H, FIELD_SIZE_SPRITE, Z
 from utils import wrap
 from assets import get_sprite
 from glob import globs
-from ui import Ui
+from ui import Ui, Manager, UiMaster
 
 
 def setup_in_game_ui(group):
-    init_minimap(group)
-
-
-def init_minimap(group):
-    y = Z * 8
     x = W - Z * (4 * 16 + 8)
+    y = Z * 8
+
+    managers = [
+        init_minimap(x, y, group),
+        init_life_bar(x, y + 4 * 16 * Z, group),
+    ]
+
+    return UiMaster([m for m in managers if m is not None], group)
+
+
+def init_minimap(x, y, group):
 
     # center
     cx, cy = x + Z * 2 * 16, y + Z * 2 * 16
@@ -33,6 +39,15 @@ def init_minimap(group):
         MmMothership(cx, cy, m, group)
 
     MmHero(cx, cy, globs.groups.hero, group)
+    return None
+
+
+def init_life_bar(x, y, group):
+    cx, cy = x + Z * 2 * 16, y + Z * 0.5 * 16
+
+    manager = LifeBar(cx, cy, group)
+
+    return manager
 
 
 class MmCorner(Ui):
@@ -88,3 +103,47 @@ class MmHero(Ui):
             sx, sy = 0, 0
 
         return self.center + Vector2(wrap(sx), wrap(sy)) * 4 / FIELD_SIZE_SPRITE
+
+
+class Life(Ui):
+    def __init__(self, x, y, i, n, *args, **kwargs):
+        self.center_x = x
+        self.image = get_sprite("hero")
+        size = self.image.get_size()
+        self.i = i
+        self.n = n
+        super().__init__(0, y, *size, *args, **kwargs)
+        self.on_update_pos(None, n)
+
+    def on_die(self, _):
+        self.kill()
+
+    def on_update_pos(self, _, n):
+        self.n = n
+        self.rect.centerx = ((self.i + 0.5) / self.n - 0.5) * Z * 4 * 16 + self.center_x
+
+
+class LifeBar(Manager):
+    def __init__(self, cx, cy, group):
+        super().__init__()
+        self.lives = []
+        self.cx = cx
+        self.cy = cy
+        self.group = group
+
+    def up(self):
+        i = len(self.lives)
+        n = globs.life + 1
+
+        if i != n:
+            for life in self.lives:
+                self.send(life, "update_pos", n)
+
+            while i < n:
+                self.lives.append(Life(self.cx, self.cy, i, n, self.group))
+                i += 1
+
+            while i > n:
+                life = self.lives.pop()
+                self.send(life, "die")
+                i -= 1

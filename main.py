@@ -35,6 +35,7 @@ key_map = {
     "fire": pygame.K_c,
     "ui_select": pygame.K_RETURN,
     "ui_back": pygame.K_BACKSPACE,
+    "debug": pygame.K_KP_PLUS,
 }
 
 
@@ -109,6 +110,11 @@ def key_back(_, event):
     return event.key == key_map["ui_back"]
 
 
+@handler.register(pygame.KEYDOWN, "debug")
+def key_back(_, event):
+    return event.key == key_map["debug"]
+
+
 @handler.register(pygame.QUIT, "quit")
 def on_quit(_, __):
     return True
@@ -162,7 +168,7 @@ def run_level(game_state, screen, level_name):
     load_level(level_name, visible, ally_bullet,
                enemy_bullet, enemy, solid, hero, mothership)
 
-    setup_in_game_ui(ui)
+    ui_master = setup_in_game_ui(ui)
 
     save_hero_state(globs, hero.sprite)
 
@@ -184,8 +190,13 @@ def run_level(game_state, screen, level_name):
 
         if actions.quit:
             break
+
         if actions.reload:
             reset()
+
+        if actions.debug:
+            globs.life += 1
+
         elif actions.loose:
             next_state = LOOSE_STATE
             print("You lost !")
@@ -203,7 +214,7 @@ def run_level(game_state, screen, level_name):
         visible.update()
         globs.spawn_proba = max_spawn_rate / (1 + len(enemy.sprites()))
 
-        ui.update()
+        ui_master.update()
 
         # draw
         screen.fill(BLACK)

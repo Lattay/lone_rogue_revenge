@@ -24,3 +24,24 @@ class Ui(Actor, Sprite):
         self._handle_messages()
         self.up()
         self.ticks += 1
+
+
+class Manager(Actor):
+    def up(self):
+        pass
+
+    def update(self):
+        self._handle_messages()
+        self.up()
+
+
+class UiMaster(Manager):
+    def __init__(self, children, group):
+        self.group = group
+        self.children = children
+
+    def update(self):
+        self.group.update()
+
+        for m in self.children:
+            m.update()
