@@ -7,6 +7,8 @@ from constants import W, H
 from glob import globs
 from utils import wrap, Actor
 
+screen = Rect(0, 0, W, H)
+
 
 class Entity(Actor, Sprite):
     """An actor that is drawable. It has a position and a size."""
@@ -56,5 +58,4 @@ class Entity(Actor, Sprite):
         self.rect.center = (wx + W / 2, wy + H / 2)
 
     def on_screen(self):
-        screen = Rect(0, 0, W, H)
         return screen.colliderect(self.rect)

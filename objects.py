@@ -42,7 +42,7 @@ class Mine(Destructible):
         self.size = self.image.get_rect().size
 
 
-class Bullet(Destructible):
+class Bullet(Entity):
     radius = Z * 1
     speed = 6.0
 
@@ -55,6 +55,7 @@ class Bullet(Destructible):
         n = math.hypot(dx, dy)
         self.dx = dx * self.speed / n
         self.dy = dy * self.speed / n
+        self._update_rect()
 
     def bullet_group(self):
         return globs.groups.enemy_bullet
