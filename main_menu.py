@@ -6,6 +6,8 @@ from glob import globs
 from ui import UiMaster, Manager, Button, Ui
 from assets import get_sprite
 
+import webbrowser
+
 
 def setup_main_menu(group):
     managers = [MainMenuManager(group)]
@@ -107,12 +109,14 @@ class Cursor(Ui):
 
 
 def play_cb():
-    pass
+    globs.actions.quit = True
+    globs.next_level = 1
 
 
 def about_cb():
-    pass
+    webbrowser.open("https://lattay.itch.io/lone-rogue-revenge")
 
 
 def exit_cb():
-    pass
+    globs.actions.quit = True
+    globs.next_level = None

@@ -27,8 +27,8 @@ def load_assets():
         "mm_corner": scale_up(_sheet.subsurface(Rect(16, 112, 16, 16))),
         "mm_side": scale_up(_sheet.subsurface(Rect(32, 112, 16, 16))),
         "ui_pause": scale_up(_sheet.subsurface(Rect(0, 176, 48, 16))),
-        "ui_play": scale_up(_sheet.subsurface(Rect(0, 128, 32, 16))),
-        "ui_exit": scale_up(_sheet.subsurface(Rect(32, 128, 32, 16))),
+        "ui_play": scale_up(_sheet.subsurface(Rect(0, 128, 48, 16))),
+        "ui_exit": scale_up(_sheet.subsurface(Rect(0, 144, 48, 16))),
         "ui_about": scale_up(_sheet.subsurface(Rect(0, 160, 48, 16))),
         "title": scale_up(_sheet.subsurface(Rect(48, 80, 132, 28))),
     }
