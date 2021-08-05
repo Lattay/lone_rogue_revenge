@@ -37,17 +37,18 @@ class MainMenuManager(Manager):
         self.cursor_index = 0
 
     def up(self):
-        change = False
+        if not self.cursor.traveling:
+            change = False
 
-        if globs.actions.up:
-            self.cursor_index = (self.cursor_index - 1) % len(self.button_sprites)
-            change = True
-        elif globs.actions.down:
-            self.cursor_index = (self.cursor_index + 1) % len(self.button_sprites)
-            change = True
+            if globs.actions.up:
+                self.cursor_index = max(self.cursor_index - 1, 0)
+                change = True
+            elif globs.actions.down:
+                self.cursor_index = min(self.cursor_index + 1, len(self.button_sprites) - 1)
+                change = True
 
-        if change:
-            self.cursor.target_y = self.buttons[self.cursor_index].rect.centery
+            if change:
+                self.cursor.target_y = self.buttons[self.cursor_index].rect.centery
 
 
 class Title(Ui):
@@ -84,6 +85,7 @@ class Cursor(Ui):
         self.rect.center = (x, y)
 
         self.target_y = y
+        self.traveling = False
         self.v = 4
 
     def up(self):
@@ -92,8 +94,11 @@ class Cursor(Ui):
             direction = Vector2(0, dy / abs(dy))
             self.rect.center += direction * self.v
             self.image = self.moving[1 if dy > 0 else 0]
+            self.traveling = True
         else:
+            self.rect.centery = self.target_y
             self.image = self.not_moving
+            self.traveling = False
         if globs.actions.ui_select:
             self.fire()
 
